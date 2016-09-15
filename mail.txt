@@ -1,0 +1,5 @@
+sender@mail.com
+recive@mail.com
+password
+smtpserver@mail.com
+smtpport
