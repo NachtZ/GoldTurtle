@@ -551,20 +551,12 @@ func(t * Turtle)saveTurtle(){
 		return
 	}
 	defer file.Close()
-	//fmt.Fprintln(file,"[Turtle]")
-	//fmt.Fprintln(file,"[buyData]")
 	fmt.Fprintf(file,"%f %f %f %d\n",t.buyData.amount,t.buyData.total,t.buyData.enter,t.buyData.unitNum)
-	//fmt.Fprintln(file,"[sellData]")
 	fmt.Fprintf(file,"%f %f %f %d\n",t.sellData.amount,t.sellData.total,t.sellData.enter,t.sellData.unitNum)
-	//fmt.Fprintln(file,"[base]")
 	fmt.Fprintf(file,"%f %f %f %f %f %f %f %f %f %f\n",t.base.n,t.base.tr,t.base.pdc,t.base.pdn,t.base.high10,t.base.low10,t.base.high20,t.base.low20,t.base.high55,t.base.low55)
-	//fmt.Fprintln(file,"[perdeal]")
 	fmt.Fprintf(file,"%f\n",t.perdeal)
-	//fmt.Fprintln(file,"[total]")
 	fmt.Fprintf(file,"%f\n",t.total)
-	//fmt.Fprintln(file,"[buy]")
 	fmt.Fprintln(file,t.buy)
-	//fmt.Fprintln(file,"[sell]")
 	fmt.Fprintln(file,t.sell)
 }
 
@@ -616,7 +608,7 @@ func initMail(path string){
 }
 
 func mainp() {
-	g := getGoldData("d:/gold.txt")
+	g := getGoldData("gold.txt")
 	log.Println(len(g))
 	runTurtle(g)
 	//test()
