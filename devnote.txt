@@ -1,0 +1,17 @@
+goldTurtle:
+    a program to crawel gold trade information and give advise to trade.
+
+    addr.txt:
+        addr for database.
+    mail.txt:
+        mail accounts for the program.
+    html.go:
+        to show gold message and trade advise in webpage.
+    db.go:
+        read info from datebase.
+    phaseXml.go:
+        crawel gold information and caculate whether to trade or not.
+    runGold.go:
+        drive the whole program.
+    tutle.dat:
+        run-time information, like pdn, total money and so on.

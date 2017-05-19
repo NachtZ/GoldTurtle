@@ -1,36 +1,33 @@
 package main
 
 import (
-	"bytes"
-	"encoding/xml"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/smtp"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-	"log"
-	"os"
-
 )
 
 type Gold struct {
 	date    string
 	price   float64
 	open    float64
-	buy 	float64
-	sell 	float64
+	buy     float64
+	sell    float64
 	high    float64
 	low     float64
 	percent string
 }
 
 type Direct struct {
-	amount   float64
-	total    float64
-	enter    float64
+	amount  float64
+	total   float64
+	enter   float64
 	unitNum int
 }
 
@@ -57,10 +54,10 @@ type Turtle struct {
 	sell     bool
 }
 
-var from,dest,pwd,server string
+var from, dest, pwd, server string
 var port int
-var values = make([]float64,30)
-var ints = make([]int,4)
+var values = make([]float64, 30)
+var ints = make([]int, 4)
 var timenow = "Init"
 
 func max3(a, b, c float64) float64 {
@@ -109,6 +106,7 @@ func getHighLow(idx, day int, g []Gold) (high, low float64) {
 	return
 }
 
+/*
 func runTurtle(g []Gold) {
 	dataLen := len(g)
 	if dataLen < 22 {
@@ -224,8 +222,8 @@ func runTurtle(g []Gold) {
 	log.Println(low55, high55)
 	log.Println(total, smoney, bmoney)
 
-}
-
+}*/
+/*
 func getGoldData(path string) []Gold {
 	var t xml.Token
 	var err error
@@ -233,7 +231,7 @@ func getGoldData(path string) []Gold {
 	time := 0
 	count := 0
 	content, err := ioutil.ReadFile(path)
-	if err!= nil{
+	if err != nil {
 		log.Println(err)
 		return g
 	}
@@ -291,16 +289,16 @@ func getGoldData(path string) []Gold {
 
 	return g
 }
-
-func crawlGoldNow() (Gold,error) {
+*/
+func crawlGoldNow() (Gold, error) {
 	var g Gold
 	url := "http://www.icbc.com.cn/ICBCDynamicSite/Charts/GoldTendencyPicture.aspx"
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Println(1, err)
-		return g,err
+		return g, err
 	}
-	body,_ := ioutil.ReadAll(resp.Body)
+	body, _ := ioutil.ReadAll(resp.Body)
 	html := string(body)
 	html = strings.Replace(html, " ", "", -1)
 	html = strings.Replace(html, "	", "", -1)
@@ -309,30 +307,30 @@ func crawlGoldNow() (Gold,error) {
 	re := regexp.MustCompile("<tdstyle=\"width:.*?%;height:23px\"align=\"middle\">(.*?)</td>")
 	res := re.FindAllStringSubmatch(html, -1)
 	t := time.Now()
-	hour,min,sec := t.Clock()
-	year,mon,day := t.Date()
-	g.date = fmt.Sprintf("%d-%d-%d %d:%d:%d",year,mon,day,hour,min,sec)
-	g.buy,_ = strconv.ParseFloat(res[38][1],32)
-	g.sell,_ = strconv.ParseFloat(res[39][1],32)
-	g.price,_ = strconv.ParseFloat(res[40][1],32)
-	g.high,_ = strconv.ParseFloat(res[41][1],32)
-	g.low,_ = strconv.ParseFloat(res[42][1],32)
-	return g,nil
+	hour, min, sec := t.Clock()
+	year, mon, day := t.Date()
+	g.date = fmt.Sprintf("%d-%d-%d %d:%d:%d", year, mon, day, hour, min, sec)
+	g.buy, _ = strconv.ParseFloat(res[38][1], 32)
+	g.sell, _ = strconv.ParseFloat(res[39][1], 32)
+	g.price, _ = strconv.ParseFloat(res[40][1], 32)
+	g.high, _ = strconv.ParseFloat(res[41][1], 32)
+	g.low, _ = strconv.ParseFloat(res[42][1], 32)
+	return g, nil
 }
 
 func (t *Turtle) run(g Gold) {
 	var act string
-	var action,actionType int//action do noting 0 buy 1,sell 2, actionType : 加仓0，建仓1，盈利清仓2，止损清仓3
-	var price,amount,earn,watermark float64
-	var action1,actionType1 int//action do noting 0 buy 1,sell 2, actionType : 加仓0，建仓1，盈利清仓2，止损清仓3
-	var price1,amount1,earn1,watermark1 float64
+	var action, actionType int //action do noting 0 buy 1,sell 2, actionType : 加仓0，建仓1，盈利清仓2，止损清仓3
+	var price, amount, earn, watermark float64
+	var action1, actionType1 int //action do noting 0 buy 1,sell 2, actionType : 加仓0，建仓1，盈利清仓2，止损清仓3
+	var price1, amount1, earn1, watermark1 float64
 
 	times := time.Now()
-	hour,min,sec := times.Clock()
-	year,mon,day := times.Date()
+	hour, min, sec := times.Clock()
+	year, mon, day := times.Date()
 	tr := max3(t.base.pdc-g.low, g.high-t.base.pdc, g.high-g.low)
-	t.base.n = (tr +19*t.base.pdn)/20
-	act = fmt.Sprintf("%d-%d-%d %d:%d:%d",year,mon,day,hour,min,sec)
+	t.base.n = (tr + 19*t.base.pdn) / 20
+	act = fmt.Sprintf("%d-%d-%d %d:%d:%d", year, mon, day, hour, min, sec)
 	if t.sell || t.buy {
 		if t.buy {
 			if g.sell < t.buyData.enter-t.base.n/2 && t.total >= t.perdeal && t.buyData.unitNum < 8 {
@@ -409,28 +407,28 @@ func (t *Turtle) run(g Gold) {
 			}
 		}
 	}
-	 if t.sell == false || t.buy == false{
+	if t.sell == false || t.buy == false {
 		if t.total < t.perdeal*4 {
 			return //herr may need to give an alart.
 		}
 		if g.buy > t.base.high20 || g.sell < t.base.low20 {
 			if g.buy > t.base.high20 && t.sell == false {
 				t.sell = true
-				amount1 = 4 * t.perdeal /g.buy
+				amount1 = 4 * t.perdeal / g.buy
 				t.sellData.amount = amount
 				t.sellData.total = 4 * t.perdeal
 				t.sellData.enter = g.buy
 				t.sellData.unitNum = 4
-				t.total -= 4*t.perdeal
+				t.total -= 4 * t.perdeal
 				price1 = g.buy
 				action1 = 2
 				actionType1 = 1
-			} 
-			if g.sell < t.base.low20 && t.buy == false{
+			}
+			if g.sell < t.base.low20 && t.buy == false {
 				t.buy = true
-				amount = 4 * t.perdeal /g.sell
+				amount = 4 * t.perdeal / g.sell
 				t.buyData.amount = amount
-				t.total -= 4*t.perdeal
+				t.total -= 4 * t.perdeal
 				t.buyData.total = 4 * t.perdeal
 				t.buyData.enter = g.sell
 				t.buyData.unitNum = 4
@@ -441,9 +439,9 @@ func (t *Turtle) run(g Gold) {
 		}
 	}
 	log.Println(t.base.n)
-	log.Println("Buy",act,action,actionType,price,amount,earn,watermark)
-	log.Println("Sell",act,action1,actionType1,price1,amount1,earn1,watermark1)
-	values[0] = t.total+t.buyData.total+t.sellData.total
+	log.Println("Buy", act, action, actionType, price, amount, earn, watermark)
+	log.Println("Sell", act, action1, actionType1, price1, amount1, earn1, watermark1)
+	values[0] = t.total + t.buyData.total + t.sellData.total
 	values[1] = t.total
 	values[2] = t.buyData.total
 	values[3] = t.buyData.enter
@@ -453,7 +451,7 @@ func (t *Turtle) run(g Gold) {
 	values[7] = t.sellData.amount
 	values[8] = g.buy
 	values[9] = g.sell
-	values[10] = (g.buy+g.sell)/2
+	values[10] = (g.buy + g.sell) / 2
 	values[11] = g.high
 	values[12] = g.low
 	values[13] = t.base.pdn
@@ -466,19 +464,17 @@ func (t *Turtle) run(g Gold) {
 	values[28] = t.base.high10
 	values[29] = t.base.low10
 	timenow = act
-	if action == 0 && action1 == 0{
-		return//nothing to do, no need to log.
+	if action == 0 && action1 == 0 {
+		return //nothing to do, no need to log.
 	}
 
-	
-
-	if action != 0{
+	if action != 0 {
 		watermark = t.buyData.total
-		err := writeLog(act,action,actionType,price,amount,earn,watermark)
-		if err!= nil{
+		err := writeLog(act, action, actionType, price, amount, earn, watermark)
+		if err != nil {
 			log.Println(err)
 		}
-		go sendMail(phaseAction(act,action,actionType,price,amount,earn,watermark))
+		go sendMail(phaseAction(act, action, actionType, price, amount, earn, watermark))
 		ints[0] = 1
 		ints[1] = actionType
 		values[16] = price
@@ -486,14 +482,14 @@ func (t *Turtle) run(g Gold) {
 		values[18] = earn
 		values[19] = watermark
 	}
-	if action1 != 0{
+	if action1 != 0 {
 		watermark1 = t.sellData.total
-		act = fmt.Sprintf("%d-%d-%d %d:%d:%d",year,mon,day,hour,min,sec+1)
-		err := writeLog(act,action1,actionType1,price1,amount1,earn1,watermark1)
-		if err!= nil{
+		act = fmt.Sprintf("%d-%d-%d %d:%d:%d", year, mon, day, hour, min, sec+1)
+		err := writeLog(act, action1, actionType1, price1, amount1, earn1, watermark1)
+		if err != nil {
 			log.Println(err)
 		}
-		go sendMail(phaseAction(act,action1,actionType1,price1,amount1,earn1,watermark1))
+		go sendMail(phaseAction(act, action1, actionType1, price1, amount1, earn1, watermark1))
 		ints[2] = 2
 		ints[3] = actionType1
 		values[20] = price1
@@ -504,83 +500,83 @@ func (t *Turtle) run(g Gold) {
 
 }
 
-func phaseAction(act string,action,actionType int,price,amount,earn,watermark float64)string{
+func phaseAction(act string, action, actionType int, price, amount, earn, watermark float64) string {
 	mailContent := act + ":\n"
-	tmp := []string{"加仓","建仓","盈利清仓","止损清仓"}
-	if action == 1{
+	tmp := []string{"加仓", "建仓", "盈利清仓", "止损清仓"}
+	if action == 1 {
 		mailContent += "buy "
-	}else{
+	} else {
 		mailContent += "sell "
 	}
 	mailContent += tmp[actionType] + "\n"
-	mailContent += fmt.Sprintf("操作价格:%f ",price)
+	mailContent += fmt.Sprintf("操作价格:%f ", price)
 	mailContent += fmt.Sprintf(" 数目：%f", amount)
-	mailContent += fmt.Sprintf("目前仓位：%f\n" , watermark)
+	mailContent += fmt.Sprintf("目前仓位：%f\n", watermark)
 	return mailContent
 }
 
-func NewTurtle()*Turtle{
+func NewTurtle() *Turtle {
 	t := &Turtle{
-		perdeal:1000.0,
-		total:20000.0,
+		perdeal: 1000.0,
+		total:   20000.0,
 	}
 	return t
 }
 
-func(t * Turtle)updateBase(pdc float64){
-	g,err := readGoldDay(60)
-	if err!=nil{
+func (t *Turtle) updateBase(pdc float64) {
+	g, err := readGoldDay(60)
+	if err != nil {
 		log.Println(err)
-		return 
+		return
 	}
-	t.base.high10,t.base.low10 = getHighLow(0,10,g)
-	t.base.high20,t.base.low20 = getHighLow(0,20,g)
-	t.base.high55,t.base.low55 = getHighLow(0,55,g)
-	firstN :=0.0
-	if t.base.pdn == 0{//means the new turtle, need to caculate new base data.
+	t.base.high10, t.base.low10 = getHighLow(0, 10, g)
+	t.base.high20, t.base.low20 = getHighLow(0, 20, g)
+	t.base.high55, t.base.low55 = getHighLow(0, 55, g)
+	firstN := 0.0
+	if t.base.pdn == 0 { //means the new turtle, need to caculate new base data.
 		for i := 1; i <= 20; i++ {
-		//  pdc = g[idx].open
+			//  pdc = g[idx].open
 			firstN += max3(g[i-1].open-g[i].low, g[i].high-g[i-1].open, g[i].high-g[i].low)
 		}
-		firstN += max3(pdc - g[0].low,g[0].high-pdc,g[0].high-g[0].low)
-		t.base.pdn = firstN/20
-	}else{
+		firstN += max3(pdc-g[0].low, g[0].high-pdc, g[0].high-g[0].low)
+		t.base.pdn = firstN / 20
+	} else {
 		t.base.pdn = t.base.n
 	}
 	t.base.pdc = pdc
 }
 
-func(t * Turtle)saveTurtle(){
-	file,err := os.Create("tutle.dat")
-	if err!= nil{
+func (t *Turtle) saveTurtle() {
+	file, err := os.Create("tutle.dat")
+	if err != nil {
 		log.Println(err)
 		return
 	}
 	defer file.Close()
-	fmt.Fprintf(file,"%f %f %f %d\n",t.buyData.amount,t.buyData.total,t.buyData.enter,t.buyData.unitNum)
-	fmt.Fprintf(file,"%f %f %f %d\n",t.sellData.amount,t.sellData.total,t.sellData.enter,t.sellData.unitNum)
-	fmt.Fprintf(file,"%f %f %f %f %f %f %f %f %f %f\n",t.base.n,t.base.tr,t.base.pdc,t.base.pdn,t.base.high10,t.base.low10,t.base.high20,t.base.low20,t.base.high55,t.base.low55)
-	fmt.Fprintf(file,"%f\n",t.perdeal)
-	fmt.Fprintf(file,"%f\n",t.total)
-	fmt.Fprintln(file,t.buy)
-	fmt.Fprintln(file,t.sell)
+	fmt.Fprintf(file, "%f %f %f %d\n", t.buyData.amount, t.buyData.total, t.buyData.enter, t.buyData.unitNum)
+	fmt.Fprintf(file, "%f %f %f %d\n", t.sellData.amount, t.sellData.total, t.sellData.enter, t.sellData.unitNum)
+	fmt.Fprintf(file, "%f %f %f %f %f %f %f %f %f %f\n", t.base.n, t.base.tr, t.base.pdc, t.base.pdn, t.base.high10, t.base.low10, t.base.high20, t.base.low20, t.base.high55, t.base.low55)
+	fmt.Fprintf(file, "%f\n", t.perdeal)
+	fmt.Fprintf(file, "%f\n", t.total)
+	fmt.Fprintln(file, t.buy)
+	fmt.Fprintln(file, t.sell)
 }
 
-func(t * Turtle)readTurtle(){
-	file,err := os.Open("tutle.dat")
-	if err!= nil{
+func (t *Turtle) readTurtle() {
+	file, err := os.Open("tutle.dat")
+	if err != nil {
 		log.Println(err)
 		return
 	}
 	defer file.Close()
-	n,err := fmt.Fscanf(file,"%f %f %f %d\n",&t.buyData.amount,&t.buyData.total,&t.buyData.enter,&t.buyData.unitNum)
-	fmt.Println(n,err)
-	fmt.Fscanf(file,"%f %f %f %d\n",&t.sellData.amount,&t.sellData.total,&t.sellData.enter,&t.sellData.unitNum)
-	fmt.Fscanf(file,"%f %f %f %f %f %f %f %f %f %f\n",&t.base.n,&t.base.tr,&t.base.pdc,&t.base.pdn,&t.base.high10,&t.base.low10,&t.base.high20,&t.base.low20,&t.base.high55,&t.base.low55)
-	fmt.Fscanf(file,"%f\n",&t.perdeal)
-	fmt.Fscanf(file,"%f\n",&t.total)
-	fmt.Fscanln(file,&t.buy)
-	fmt.Fscanln(file,&t.sell)
+	n, err := fmt.Fscanf(file, "%f %f %f %d\n", &t.buyData.amount, &t.buyData.total, &t.buyData.enter, &t.buyData.unitNum)
+	fmt.Println(n, err)
+	fmt.Fscanf(file, "%f %f %f %d\n", &t.sellData.amount, &t.sellData.total, &t.sellData.enter, &t.sellData.unitNum)
+	fmt.Fscanf(file, "%f %f %f %f %f %f %f %f %f %f\n", &t.base.n, &t.base.tr, &t.base.pdc, &t.base.pdn, &t.base.high10, &t.base.low10, &t.base.high20, &t.base.low20, &t.base.high55, &t.base.low55)
+	fmt.Fscanf(file, "%f\n", &t.perdeal)
+	fmt.Fscanf(file, "%f\n", &t.total)
+	fmt.Fscanln(file, &t.buy)
+	fmt.Fscanln(file, &t.sell)
 }
 
 func sendMail(content string) {
@@ -590,32 +586,33 @@ func sendMail(content string) {
 	// Connect to the server, authenticate, set the sender and recipient,
 	// and send the email all in one step.
 	to := []string{dest}
-	msg := []byte("To: nachtz<"+dest+">\r\n" +
-        "From: Gold<"+from+">\r\n"+
+	msg := []byte("To: nachtz<" + dest + ">\r\n" +
+		"From: Gold<" + from + ">\r\n" +
 		"Subject: discount Gophers!\r\n" +
 		"\r\n" +
 		content + "\r\n")
-	err := smtp.SendMail(server +":"+ strconv.Itoa(port), auth, from, to, msg)
+	err := smtp.SendMail(server+":"+strconv.Itoa(port), auth, from, to, msg)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func initMail(path string){
-    file,err := os.Open(path)
-    if err!=nil{
-        log.Println(err)
-    }
-    fmt.Fscanf(file,"%s\n",&from)
-    fmt.Fscanf(file,"%s\n",&dest)
-    fmt.Fscanf(file,"%s\n",&pwd)
-    fmt.Fscanf(file,"%s\n",&server)
-    fmt.Fscanf(file,"%d",&port)
+func initMail(path string) {
+	file, err := os.Open(path)
+	if err != nil {
+		log.Println(err)
+	}
+	fmt.Fscanf(file, "%s\n", &from)
+	fmt.Fscanf(file, "%s\n", &dest)
+	fmt.Fscanf(file, "%s\n", &pwd)
+	fmt.Fscanf(file, "%s\n", &server)
+	fmt.Fscanf(file, "%d", &port)
 }
 
+/*
 func mainp() {
 	g := getGoldData("gold.txt")
 	log.Println(len(g))
 	runTurtle(g)
 	//test()
-}
+}*/
