@@ -589,10 +589,10 @@ func sendMail(content string) {
 
 	// Connect to the server, authenticate, set the sender and recipient,
 	// and send the email all in one step.
-	to := []string{dest}
+	to := strings.Split(dest, ",")
 	msg := []byte("To: nachtz<" + dest + ">\r\n" +
 		"From: Gold<" + from + ">\r\n" +
-		"Subject: discount Gophers!\r\n" +
+		"Subject: Golang Gold Trade aides Want to tell you !\r\n" +
 		"\r\n" +
 		content + "\r\n")
 	err := smtp.SendMail(server+":"+strconv.Itoa(port), auth, from, to, msg)
@@ -611,6 +611,7 @@ func initMail(path string) {
 	fmt.Fscanf(file, "%s\n", &pwd)
 	fmt.Fscanf(file, "%s\n", &server)
 	fmt.Fscanf(file, "%d", &port)
+	go sendMail("The gold trade aides start in " + time.Now().String())
 }
 
 /*
