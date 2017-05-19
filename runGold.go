@@ -98,6 +98,6 @@ func test() {
 
 func main() {
 	initDB()
-	initMail("f:/mail.txt")
+	initMail("./mail.txt")
 	run()
 }

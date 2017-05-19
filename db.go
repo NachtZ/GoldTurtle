@@ -52,7 +52,7 @@ func writeLog(act string,action,actionType int,price,amount,earn,watermark float
     if err!= nil{
         return err
     }
-    insertIntoLog := "insert into actionLog(ActionTime,action,price,amount,actionType,earn,watermark)values(?,?,?,?,?,?,?)"
+    insertIntoLog := "insert into actionlog(ActionTime,action,price,amount,actionType,earn,watermark)values(?,?,?,?,?,?,?)"
     stmt,err := db.Prepare(insertIntoLog)
     if err!= nil{
         return err
@@ -71,7 +71,7 @@ func writeGoldMin(g Gold) error{
     if err!= nil{
         return err
     }
-    insertIntoGEM := "insert into GoldEveryMin(GetTime,price,buy,sell,highMid,lowMid)values(?,?,?,?,?,?)" 
+    insertIntoGEM := "insert into goldeverymin(GetTime,price,buy,sell,highMid,lowMid)values(?,?,?,?,?,?)" 
     stmt,err := db.Prepare(insertIntoGEM)
     if err!=nil{
         return err
@@ -81,6 +81,12 @@ func writeGoldMin(g Gold) error{
 }
 
 func importDailyGold(g []Gold){
+    //here to init a time conv dict.
+  //  maps := []string{"","Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"}
+   // dic := make(map[string]string)
+   // for i:=1;i<=12;i++{
+   //     dic[maps[i]] = strconv.Itoa(i)
+   // }
     db, err := sql.Open("mysql",dbaddr)
     if err!= nil{
         log.Println(err)
@@ -92,7 +98,7 @@ func importDailyGold(g []Gold){
         log.Println(err)
         return
     }
-    insertIntoGED := "insert into GoldEveryDay(getDate,price,open,high,low)values(?,?,?,?,?)"
+    insertIntoGED := "insert into goldeveryday(getDate,price,open,high,low)values(?,?,?,?,?)"
 
     stmt,err := db.Prepare(insertIntoGED)
     if err != nil{
@@ -100,6 +106,8 @@ func importDailyGold(g []Gold){
         return
     }
     for i:= len(g)-1;i>=0;i--{
+  //  s := strings.Split(g[i].date,"年月日")
+  //  tmpdate := s[2] + "-"+dic[s[0]]+"-"+strings.Replace(s[1],",","",-1)
     g[i].date = strings.Replace(g[i].date,"年","-",-1)
     g[i].date = strings.Replace(g[i].date,"月","-",-1)
     g[i].date = strings.Replace(g[i].date,"日","",-1)
@@ -113,13 +121,16 @@ func importDailyGold(g []Gold){
 }
 
 func initDB() error{
-
-    file,err := os.Open("f:/addr.txt")
+    //g := getGoldData("d:/gold.txt")
+    //importGold(g)
+    file,err := os.Open("./addr.txt")
     if err!=nil{
         return err
     }
     defer file.Close()
     str,_ := ioutil.ReadAll(file)
     dbaddr = string(str)//need to read file for safety
+  //  g,err := readGoldDay(55)
+  //  fmt.Println(g[0].date,err)
   return nil
 }
