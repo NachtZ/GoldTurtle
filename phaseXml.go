@@ -379,14 +379,15 @@ func (t *Turtle) run(g Gold) {
 				t.sellData.enter = g.buy
 				t.sellData.total += g.buy
 				amount1 = t.perdeal / g.buy
-				t.sellData.amount += amount
+				t.sellData.amount += amount1
 				t.buyData.unitNum++
 				actionType1 = 0
 				action1 = 2
 				price1 = g.buy
 			} else {
 				if g.sell < t.base.low10 {
-					t.total += 2*t.sellData.total - g.sell*float64(t.sellData.amount)
+					//t.total += 2*t.sellData.total - g.sell*float64(t.sellData.amount)
+					t.total += g.buy * float64(t.sellData.amount)
 					amount1 = t.sellData.amount
 					t.sellData.total = 0
 					t.sellData.amount = 0
@@ -397,7 +398,8 @@ func (t *Turtle) run(g Gold) {
 					action1 = 2
 					price1 = g.sell
 				} else if t.sellData.enter+2*t.base.n < g.sell {
-					t.total += 2*t.sellData.total - g.sell*float64(t.sellData.amount)
+					//t.total += 2*t.sellData.total - g.sell*float64(t.sellData.amount)
+					t.total += g.buy * float64(t.sellData.amount)
 					amount1 = t.sellData.amount
 					t.sellData.total = 0
 					t.sellData.amount = 0
