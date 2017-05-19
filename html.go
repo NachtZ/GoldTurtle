@@ -80,7 +80,13 @@ func formatStats() string {
 <td>PDN</td><td>%f</td></tr>
 <tr><td>N</td><td>%f</td>
 <td>TR</td><td>%f</td></tr>
-</table>`, timenow,values[0],values[1],values[2],values[3],values[4],values[5],values[6],values[7],values[8],values[9],values[10],values[11],values[12],values[13],values[14],values[15])
+<tr><td>55日最高</td><td>%f</td>
+<td>55日最低</td><td>%f</td></tr>
+<tr><td>20日最高</td><td>%f</td>
+<td>20日最低</td><td>%f</td></tr>
+<tr><td>10日最高</td><td>%f</td>
+<td>10日最低</td><td>%f</td></tr>
+</table>`, timenow,values[0],values[1],values[2],values[3],values[4],values[5],values[6],values[7],values[8],values[9],values[10],values[11],values[12],values[13],values[14],values[15],values[24],values[25],values[26],values[27],values[28],values[29])
     table1 += fmt.Sprintf(`<br></br><table border="1">
 <tr><th colspan="5">Action Log</th></tr>
 <tr><td>买/卖</td>
@@ -102,6 +108,8 @@ func formatStats() string {
 <td>%f</td>
 <td>%f</td></tr>
 </table>(注：0表示没有操作，1表示买入，2表示卖出。加仓0，建仓1，盈利清仓2，止损清仓3。)`,ints[0],ints[1],values[16],values[17],values[18],values[19],ints[2],ints[3],values[20],values[21],values[22],values[23])
+
+
 fmt.Println(values)
 fmt.Println(ints)
 return table1;

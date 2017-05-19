@@ -59,7 +59,7 @@ type Turtle struct {
 
 var from,dest,pwd,server string
 var port int
-var values = make([]float64,24)
+var values = make([]float64,30)
 var ints = make([]int,4)
 var timenow = "Init"
 
@@ -459,6 +459,12 @@ func (t *Turtle) run(g Gold) {
 	values[13] = t.base.pdn
 	values[14] = t.base.n
 	values[15] = tr
+	values[24] = t.base.high55
+	values[25] = t.base.low55
+	values[26] = t.base.high20
+	values[27] = t.base.low20
+	values[28] = t.base.high10
+	values[29] = t.base.low10
 	timenow = act
 	if action == 0 && action1 == 0{
 		return//nothing to do, no need to log.
