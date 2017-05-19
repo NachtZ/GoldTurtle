@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -310,6 +311,9 @@ func crawlGoldNow() (Gold, error) {
 	hour, min, sec := t.Clock()
 	year, mon, day := t.Date()
 	g.date = fmt.Sprintf("%d-%d-%d %d:%d:%d", year, mon, day, hour, min, sec)
+	if len(res) < 43 {
+		return g, errors.New("The crawler doesn't get anything.")
+	}
 	g.buy, _ = strconv.ParseFloat(res[38][1], 32)
 	g.sell, _ = strconv.ParseFloat(res[39][1], 32)
 	g.price, _ = strconv.ParseFloat(res[40][1], 32)
