@@ -67,6 +67,10 @@ func run() {
 func work(t *Turtle) {
 	times := time.Now()
 	h, m, s := times.Clock()
+	if times.Weekday() == 6 && h >= 4 || times.Weekday() == 0 || times.Weekday() == 1 && h < 8 {
+		log.Println(times.Weekday(), ":", h)
+		return
+	}
 	g, err := crawlGoldNow()
 	if err != nil {
 		log.Println(err)

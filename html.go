@@ -10,7 +10,7 @@ const (
 	pageTop = `<!DOCTYPE HTML><html><head>
 <style>.error{color:#FF0000;}</style></head><title>Gold Crawler && Turtle</title>
 <body><h3>Result</h3>
-<p>Show the result of Gold Crawler and Turtle</p>`
+<p>Show the result of Gold Crawler and Turtle version 1.99(update in 2017/05/19 20:57)</p>`
 	form = `<form action="/" method="POST">
 <input type="submit" value="Fresh">
 </form>`
